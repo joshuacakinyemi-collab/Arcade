@@ -1,0 +1,272 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #dde4ed;
+  --bg-top: #f0f4f8;
+  --bg-bottom: #c8d2de;
+  --accent: #0e8b00;
+  --accent-glow: rgba(0, 145, 255, 0.25);
+  --text: #1a2a3a;
+  --text-dim: #7a90a8;
+  --tile-bg: linear-gradient(170deg, #ffffff 0%, #dde8f4 55%, #c8d8ec 100%);
+  --tile-empty: linear-gradient(170deg, #e4eaf2 0%, #cdd6e3 100%);
+  --tile-shadow: rgba(100, 130, 170, 0.35);
+  --font-head: 'Orbitron', monospace;
+  --font-body: 'Rajdhani', sans-serif;
+}
+
+/* ── Body ───────────────────────────────────────────────────────── */
+body {
+  background: linear-gradient(175deg, var(--bg-top) 0%, var(--bg) 50%, var(--bg-bottom) 100%);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Subtle dot grid like Wii U background texture */
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(150, 180, 210, 0.35) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Wii U characteristic right-side white vignette */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.55), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Left vignette */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(180, 200, 220, 0.3), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.scanlines {
+  display: none;
+}
+
+/* not needed on light theme */
+
+/* ── Header ─────────────────────────────────────────────────────── */
+header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.4rem 3rem 1rem;
+  width: 100%;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+  border-bottom: 1px solid rgba(100, 150, 200, 0.2);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, transparent 100%);
+}
+
+header h1 {
+  font-family: var(--font-head);
+  font-size: clamp(0.9rem, 2.5vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text);
+}
+
+.logo-bracket {
+  font-family: var(--font-head);
+  font-size: clamp(0.9rem, 2.5vw, 1.6rem);
+  font-weight: 900;
+  color: var(--accent);
+}
+
+/* ── Main ───────────────────────────────────────────────────────── */
+main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 2rem;
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+/* ── Grid ───────────────────────────────────────────────────────── */
+.wiiu-layout {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: min(740px, 92vw);
+}
+
+/* ── Tile ───────────────────────────────────────────────────────── */
+.tile {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--tile-bg);
+  box-shadow:
+    0 4px 14px var(--tile-shadow),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 -1px 0 rgba(150, 180, 210, 0.4) inset;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
+  cursor: pointer;
+}
+
+/* Gloss shine — strong like Wii U icons */
+.tile::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.75) 0%,
+      rgba(255, 255, 255, 0.15) 100%);
+  border-radius: 18% 18% 50% 50% / 30% 30% 15% 15%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Bottom subtle shadow inside */
+.tile::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 25%;
+  background: linear-gradient(0deg, rgba(100, 140, 180, 0.15), transparent);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.tile-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+  gap: 5px;
+  padding: 12%;
+}
+
+.tile-icon {
+  width: 62%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.tile-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+
+}
+
+.tile-label {
+  font-family: var(--font-head);
+  font-size: clamp(0.28rem, 1vw, 0.52rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #2a3a5a;
+  text-align: center;
+  position: relative;
+  z-index: 3;
+  text-transform: uppercase;
+}
+
+/* ── Active tile hover ──────────────────────────────────────────── */
+.tile:not(.tile--empty):hover {
+  transform: scale(1.09) translateY(-5px);
+  box-shadow:
+    0 12px 30px rgba(80, 180, 87, 0.45),
+    0 0 0 2px rgba(68, 255, 0, 0.6),
+    0 0 18px rgba(0, 255, 21, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+.tile:not(.tile--empty):active {
+  transform: scale(0.96);
+}
+
+/* ── Empty tiles ────────────────────────────────────────────────── */
+.tile--empty {
+  background: var(--tile-empty);
+  box-shadow:
+    0 3px 10px rgba(100, 130, 160, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.6) inset;
+  cursor: default;
+  opacity: 0.6;
+}
+
+.tile--empty .tile-label {
+  color: var(--text-dim);
+  font-size: clamp(0.25rem, 0.85vw, 0.42rem);
+}
+
+/* ── Footer ─────────────────────────────────────────────────────── */
+footer {
+  width: 100%;
+  padding: 0.9rem 2rem;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  border-top: 1px solid rgba(150, 180, 210, 0.35);
+  background: linear-gradient(0deg, rgba(255, 255, 255, 0.5) 0%, transparent 100%);
+  position: relative;
+  z-index: 10;
+  text-transform: uppercase;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .wiiu-layout {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+}

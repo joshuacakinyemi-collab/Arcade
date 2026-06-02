@@ -1,0 +1,482 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-image: url(window.png);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.game-container {
+  position: relative;
+  width: min(560px, 90vmin);
+  height: min(560px, 90vmin);
+}
+
+.grid {
+  width: 100%;
+  height: 100%;
+  border: solid rgb(108, 128, 255);
+  background-color: black;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.grid div {
+  width: calc(100% / 28);
+  height: calc(100% / 28);
+  position: relative;
+}
+
+
+
+.pac-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 30%;
+  height: 30%;
+  background: white;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.wall {
+  background-color: blue;
+}
+
+.power-pellet {
+  content: '';
+  background: rgb(253, 255, 216);
+  border-radius: 50%;
+  width: 30%;
+  height: 30%;
+  margin: auto;
+  position: absolute;
+  inset: 0;
+}
+
+.ghost {
+  z-index: 1;
+}
+
+/* keep scared-ghost colour on top of ghost colour but under dot */
+.scared-ghost {
+  background-color: aquamarine;
+  background-size: cover;
+}
+
+.blinky {
+  background-color: red;
+  background-size: cover;
+}
+
+.pinky {
+  background-color: pink;
+  background-size: cover;
+}
+
+.inky {
+  background-color: cyan;
+  background-size: cover;
+}
+
+.clyde {
+  background-color: orange;
+  background-size: cover;
+}
+
+.licky {
+  background-color: hotpink;
+  background-size: cover;
+}
+
+.sneaky {
+  background-color: rgb(35, 34, 34);
+  background-size: cover;
+}
+
+.sticky {
+  background-color: greenyellow;
+  background-size: cover;
+}
+
+.tike {
+  background-color: rgb(115, 82, 0);
+  background-size: cover;
+}
+
+.pac-man {
+  background-color: #fdff00;
+  background-size: cover;
+  border-radius: 50%;
+  z-index: 3;
+}
+
+#overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  color: yellow;
+}
+
+#overlay h1,
+#overlay p {
+  position: relative;
+  z-index: 101;
+}
+
+#overlay.hidden {
+  display: none;
+}
+
+#overlay h1 {
+  font-size: clamp(1rem, 4vmin, 2rem);
+  margin-bottom: 1rem;
+}
+
+#overlay p {
+  font-size: clamp(0.6rem, 2vmin, 0.9rem);
+  margin: 0.4rem 0;
+}
+
+
+/* Windows 7 Aero Glass Window CSS */
+/* Based on 7.css — https://github.com/khang-nd/7.css */
+
+.aero-window {
+  font-family: "Segoe UI", "SegoeUI", "Noto Sans", sans-serif;
+  font-size: 9pt;
+  width: auto;
+  border: 1px solid rgba(0, 0, 0, 0.7);
+  border-radius: 6px;
+  box-shadow:
+    2px 2px 10px 1px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.98);
+  position: relative;
+  z-index: 0;
+  display: inline-block;
+}
+
+/* Full-window colored glass layer */
+.aero-window::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  background:
+    linear-gradient(transparent 20%, rgba(255, 255, 255, 0.7) 40%, transparent 41%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.4), rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.2)),
+    hsl(210, 55%, 45%);
+  background-color: hsl(210, 55%, 45%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.99);
+  opacity: 0.65;
+}
+
+/* Blur backdrop */
+.aero-window::after {
+  content: "";
+  position: absolute;
+  z-index: -10;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+}
+
+/* Title bar — authentic diagonal glass stripe texture */
+.aero-title-bar {
+  min-width: 0;
+  width: 100%;
+  padding: 6px;
+  padding-top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 6px 6px 0 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.99),
+    inset 1px 0 0 rgba(255, 255, 255, 0.99),
+    inset -1px 0 0 rgba(255, 255, 255, 0.99);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.33) 70px, transparent 100px),
+    linear-gradient(225deg, rgba(255, 255, 255, 0.33) 70px, transparent 100px),
+    linear-gradient(54deg,
+      rgba(0, 0, 0, 0.13) 0 4%, rgba(102, 102, 102, 0.07) 6%, rgba(0, 0, 0, 0.13) 8% 10%,
+      rgba(0, 0, 0, 0.13) 15% 16%, rgba(170, 170, 170, 0.07) 17% 18%, rgba(0, 0, 0, 0.13) 23% 24%,
+      rgba(187, 187, 187, 0.13) 25% 26%, rgba(0, 0, 0, 0.13) 31% 33%,
+      rgba(0, 0, 0, 0.13) 34% 34.5%, rgba(187, 187, 187, 0.13) 36% 40%,
+      rgba(0, 0, 0, 0.13) 41% 41.5%, rgba(187, 187, 187, 0.13) 44% 45%,
+      rgba(187, 187, 187, 0.13) 46% 47%, rgba(0, 0, 0, 0.13) 48% 49%, rgba(0, 0, 0, 0.13) 50% 50.5%,
+      rgba(0, 0, 0, 0.13) 56% 56.5%, rgba(187, 187, 187, 0.13) 57% 63%, rgba(0, 0, 0, 0.13) 67% 69%,
+      rgba(187, 187, 187, 0.13) 69.5% 70%, rgba(0, 0, 0, 0.13) 73.5% 74%,
+      rgba(187, 187, 187, 0.13) 74.5% 79%, rgba(0, 0, 0, 0.13) 80% 84%,
+      rgba(170, 170, 170, 0.13) 85% 86%, rgba(0, 0, 0, 0.13) 87%, rgba(187, 187, 187, 0.07) 90%) left center / 100vw 100vh no-repeat fixed;
+}
+
+/* Title icon */
+.aero-title-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  padding-top: 6px;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Title text — black with white glow for glass legibility */
+.aero-title-bar-text {
+  color: #000000;
+  letter-spacing: 0;
+  line-height: 15px;
+  padding-top: 6px;
+  text-shadow:
+    0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff,
+    0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Window controls strip — capsule hanging from top */
+.aero-title-bar-controls {
+  display: flex;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-top: 0;
+  border-radius: 0 0 5px 5px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.98),
+    1px 0 0 rgba(255, 255, 255, 0.98),
+    -1px 0 0 rgba(255, 255, 255, 0.98);
+}
+
+.aero-title-bar-controls button {
+  position: relative;
+  min-width: 29px;
+  min-height: 21px;
+  padding: 0;
+  border: 0;
+  border-right: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 0;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.65);
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.9), 0 1px 0 rgba(255, 255, 255, 0.8);
+  background: linear-gradient(rgba(255, 255, 255, 0.5),
+      rgba(255, 255, 255, 0.3) 45%,
+      rgba(0, 0, 0, 0.1) 50%,
+      rgba(0, 0, 0, 0.1) 75%,
+      rgba(255, 255, 255, 0.5));
+  transition: box-shadow 0.1s;
+}
+
+.aero-title-bar-controls button:first-child {
+  border-bottom-left-radius: 5px;
+}
+
+.aero-title-bar-controls button:last-child {
+  border-right: 0;
+  border-bottom-right-radius: 5px;
+  min-width: 48px;
+}
+
+/* Hover — cyan radial glow */
+.aero-title-bar-controls button:not(.close):hover {
+  background:
+    radial-gradient(circle at bottom, #2aceda, transparent 65%),
+    linear-gradient(#b6d9ee 50%, #1a6ca1 50%);
+  box-shadow: 0 0 7px 3px #5dc4f0, inset 0 0 0 1px rgba(255, 255, 255, 0.98);
+  color: white;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+
+.aero-title-bar-controls button:not(.close):active {
+  background:
+    radial-gradient(circle at bottom, #0bfdfa, transparent 65%),
+    linear-gradient(#86a7bc 50%, #092747 50%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.98);
+}
+
+/* Close button */
+.aero-title-bar-controls button.close {
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  background:
+    radial-gradient(circle at -60% 50%, rgba(0, 0, 0, 0.44) 5% 10%, transparent 50%),
+    radial-gradient(circle at 160% 50%, rgba(0, 0, 0, 0.44) 5% 10%, transparent 50%),
+    linear-gradient(rgba(224, 161, 151, 0.9), #cf796a 25% 50%, #d54f36 50%);
+}
+
+.aero-title-bar-controls button.close:hover {
+  background:
+    radial-gradient(circle at bottom, #ff8a7a, transparent 65%),
+    linear-gradient(#ffbdb3 50%, #d40000 50%);
+  box-shadow: 0 0 7px 3px #ff5030, inset 0 0 0 1px rgba(255, 255, 255, 0.98);
+  color: white;
+}
+
+.aero-title-bar-controls button.close:active {
+  background:
+    radial-gradient(circle at bottom, #ff3300, transparent 65%),
+    linear-gradient(#d45050 50%, #8b0000 50%);
+}
+
+/* Menu bar */
+.aero-window-menubar {
+  background: linear-gradient(#fff 20%, #f1f4fa 25%, #f1f4fa 43%, #d4dbee 48%, #e6eaf6);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: stretch;
+  font-size: 9pt;
+  color: #000;
+  font-family: "Segoe UI", "SegoeUI", "Noto Sans", sans-serif;
+}
+
+.aero-window-menubar span {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  cursor: default;
+}
+
+.aero-window-menubar span:hover {
+  background: #3399ff;
+  color: #fff;
+}
+
+/* Window body — solid #f0f0f0 surface, inset 6px from glass border */
+.aero-window-body {
+  margin: 6px;
+  margin-top: 0;
+  border: 1px solid rgba(0, 0, 0, 0.7);
+  background: #f0f0f0;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6);
+  padding: 0px;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+header {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+}
+
+/* Authentic Frutiger Aero Button CSS */
+.frutiger-aero-button {
+  /* OKLCH Color System for accurate colors */
+  --hue: 140;
+  --sat: 0.2;
+  --glow-intensity: 0.7;
+
+  /* Color Variables */
+  --fg: oklch(15% calc(var(--sat) * 0.5) var(--hue));
+  --bg: oklch(75% var(--sat) var(--hue) / 0.8);
+  --bg-dark: oklch(45% var(--sat) var(--hue) / 0.75);
+  --bottom-glow: radial-gradient(farthest-corner at bottom center,
+      rgba(255, 255, 255, var(--glow-intensity)),
+      transparent);
+
+  /* Base Styling */
+  background-color: var(--bg);
+  background:
+    var(--bottom-glow),
+    linear-gradient(to bottom, var(--bg-dark), var(--bg));
+
+  border: 1px solid var(--bg);
+  border-radius: 9999px;
+
+  /* Shadows and Effects */
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+
+  /* Typography */
+  color: var(--fg);
+  font-family: "Lucida Grande", "Lucida Sans Unicode", "Segoe UI", system-ui, sans-serif;
+  font-weight: 700;
+  text-shadow: 0 2px 0.5em rgba(0, 0, 0, 0.2);
+
+  /* Layout */
+  cursor: pointer;
+  position: relative;
+  transition: all 300ms ease;
+
+  /* Prevent text selection */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Top Highlight Effect */
+.frutiger-aero-button::after {
+  content: "";
+  position: absolute;
+  top: 4%;
+  left: 0.75em;
+  width: calc(100% - 1.5em);
+  height: 40%;
+  background: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0.8),
+      rgba(255, 255, 255, 0.1));
+  border-radius: inherit;
+  transition: background 400ms ease;
+  pointer-events: none;
+}
+
+/* Hover State */
+.frutiger-aero-button:hover,
+.frutiger-aero-button:focus {
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Active State */
+.frutiger-aero-button:active {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  transform: translateY(1px);
+}
+
+/* Size Variations */
+.frutiger-aero-button.small {
+  padding: 0.5em 1.5em;
+  font-size: 0.875rem;
+}
+
+.frutiger-aero-button.medium {
+  padding: 0.75em 2em;
+  font-size: 1rem;
+}
+
+.frutiger-aero-button.large {
+  padding: 1em 3em;
+  font-size: 1.125rem;
+}

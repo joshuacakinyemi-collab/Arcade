@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pac-Man</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+
+<body>
+
+  <header>
+    <a href="../hub.html"><button class="frutiger-aero-button large">⬅ Go Back</button></a>
+  </header>
+
+  <main>
+    <div class="aero-window">
+
+      <div class="aero-title-bar">
+        <span class="aero-title-icon"></span>
+        <span class="aero-title-bar-text">Pac-Man</span>
+        <div class="aero-title-bar-controls">
+          <button aria-label="Minimize">&#8212;</button>
+          <button aria-label="Maximize">&#9633;</button>
+          <button aria-label="Close" class="close">&#215;</button>
+        </div>
+      </div>
+
+      <div class="aero-window-menubar">
+        <span>Score: <strong id="score">0</strong></span>
+        <span>Level: <strong id="level">1</strong></span>
+      </div>
+
+      <div class="aero-window-body">
+        <div class="game-container">
+          <div class="grid"></div>
+          <div id="overlay" class="hidden">
+            <h1 id="overlay-title"></h1>
+            <p id="overlay-subtitle"></p>
+            <p id="overlay-score"></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+
+</html>
