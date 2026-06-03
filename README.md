@@ -1,4 +1,5 @@
-# Welcome to the Digital Arcade
+# Welcome to the Totally retro arcade
+Visit the Website here: https://joshuacakinyemi-collab.github.io/Arcade/index.html
 
 A website that is full with retro games that the user can play.
 
@@ -13,7 +14,4 @@ A website that is full with retro games that the user can play.
 4.Dino Run(COMING SOON)
 
 5.Mario(COMING SOON)
-
-## Visit the Website here: https://joshuacakinyemi-collab.github.io/Arcade/index.html
-
-And If you like it share with friends.
+ 
