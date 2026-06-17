@@ -175,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updatePacmanImage()
     pacDotEaten();
     powerPelletEaten();
+    checkForScaredGhostEaten();
     checkForGameOver();
   }
 
@@ -222,6 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
       this.speed = speed;
       this.currentIndex = startIndex;
       this.isScared = false;
+      this.isReturning = false;
       this.timerId = NaN;
       this.personality = personality;
       this.direction = 1;
@@ -232,15 +234,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function initGhosts() {
     ghosts.forEach(g => clearInterval(g.timerId));
+    const s = Math.max(0.5, Math.pow(0.9, level - 1));
     ghosts = [
-      new Ghost('blinky', 348, 250, 'chase'),
-      new Ghost('pinky', 376, 400, 'random'),
-      new Ghost('inky', 351, 300, 'intercept'),
-      new Ghost('clyde', 379, 500, 'random'),
-      new Ghost('licky', 347, 250, 'chase'),
-      new Ghost('sneaky', 349, 650, 'intercept'),
-      new Ghost('sticky', 375, 850, 'blocker'),
-      new Ghost('tike', 378, 1000, 'blocker'),
+      new Ghost('blinky', 348, 250 * s, 'chase'),
+      new Ghost('pinky',  376, 400 * s, 'random'),
+      new Ghost('inky',   351, 300 * s, 'intercept'),
+      new Ghost('clyde',  379, 500 * s, 'random'),
+      new Ghost('licky',  347, 250 * s, 'chase'),
+      new Ghost('sneaky', 349, 650 * s, 'intercept'),
+      new Ghost('sticky', 375, 850 * s, 'blocker'),
+      new Ghost('tike',   378, 1000 * s, 'blocker'),
     ];
   }
 
@@ -251,11 +254,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function getBestDirection(ghost, targetIndex) {
+    const opposite = -ghost.direction;
     const directions = [-1, 1, width, -width];
-    let bestDir = ghost.direction;
+    const preferred = directions.filter(d => d !== opposite);
+
+    let bestDir = null;
     let bestDist = Infinity;
 
-    for (const d of directions) {
+    for (const d of preferred) {
       const next = ghost.currentIndex + d;
       if (
         next >= 0 &&
@@ -269,13 +275,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
-    return bestDir;
+
+    if (bestDir === null) {
+      for (const d of directions) {
+        const next = ghost.currentIndex + d;
+        if (
+          next >= 0 &&
+          !squares[next].classList.contains('wall') &&
+          !squares[next].classList.contains('ghost')
+        ) {
+          const dist = getDistance(next, targetIndex);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestDir = d;
+          }
+        }
+      }
+    }
+
+    return bestDir ?? ghost.direction;
   }
 
   function getInterceptTarget() {
-    const offset = pacmanDirection ? pacmanDirection * 4 : 0;
-    const target = pacmanCurrentIndex + offset;
-    return (target >= 0 && target < squares.length) ? target : pacmanCurrentIndex;
+    if (!pacmanDirection) return pacmanCurrentIndex;
+    let target = pacmanCurrentIndex;
+    for (let i = 0; i < 4; i++) {
+      const next = target + pacmanDirection;
+      if (next < 0 || next >= squares.length || squares[next].classList.contains('wall')) break;
+      target = next;
+    }
+    return target;
   }
 
   function getBlockerTarget(ghost) {
@@ -283,20 +312,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const tunnelRight = window._tunnelRight;
     const distLeft = getDistance(pacmanCurrentIndex, tunnelLeft);
     const distRight = getDistance(pacmanCurrentIndex, tunnelRight);
-    const tunnel = distLeft < distRight ? tunnelLeft : tunnelRight;
-    const px = pacmanCurrentIndex % width;
-    const py = Math.floor(pacmanCurrentIndex / width);
-    const tx = tunnel % width;
-    const ty = Math.floor(tunnel / width);
-    const mx = Math.floor((px + tx) / 2);
-    const my = Math.floor((py + ty) / 2);
-    return my * width + mx;
-
+    return distLeft < distRight ? tunnelLeft : tunnelRight;
   }
 
   function getRandomDirection(ghost) {
+    const opposite = -ghost.direction;
     const directions = [-1, 1, width, -width];
-    const valid = directions.filter(d => {
+    const preferred = directions.filter(d => {
+      if (d === opposite) return false;
       const next = ghost.currentIndex + d;
       return (
         next >= 0 &&
@@ -305,13 +328,57 @@ document.addEventListener('DOMContentLoaded', () => {
         !squares[next].classList.contains('ghost')
       );
     });
-    return valid.length > 0
-      ? valid[Math.floor(Math.random() * valid.length)]
+
+    if (preferred.length > 0) {
+      return preferred[Math.floor(Math.random() * preferred.length)];
+    }
+
+    const fallback = directions.filter(d => {
+      const next = ghost.currentIndex + d;
+      return (
+        next >= 0 &&
+        next < squares.length &&
+        !squares[next].classList.contains('wall') &&
+        !squares[next].classList.contains('ghost')
+      );
+    });
+
+    return fallback.length > 0
+      ? fallback[Math.floor(Math.random() * fallback.length)]
       : ghost.direction;
   }
 
-  const CHASE_RANGE = 18;
-  const INTERCEPT_RANGE = 18;
+  function showPointsPopup(cellIndex, points) {
+    const container = document.querySelector('.game-container');
+    const containerRect = container.getBoundingClientRect();
+    const cellRect = squares[cellIndex].getBoundingClientRect();
+    const popup = document.createElement('div');
+    popup.className = 'points-popup';
+    popup.textContent = `+${points}`;
+    popup.style.left = (cellRect.left - containerRect.left + cellRect.width / 2) + 'px';
+    popup.style.top  = (cellRect.top  - containerRect.top) + 'px';
+    container.appendChild(popup);
+    setTimeout(() => popup.remove(), 800);
+  }
+
+  function eatGhost(ghost) {
+    squares[ghost.currentIndex].classList.remove('scared-ghost');
+    squares[ghost.currentIndex].classList.add('returning-ghost');
+    ghost.isScared = false;
+    ghost.isReturning = true;
+    score += 200;
+    scoreDisplay.innerHTML = score;
+    showPointsPopup(ghost.currentIndex, 200);
+    updateGhostImage(ghost);
+  }
+
+  function checkForScaredGhostEaten() {
+    ghosts.forEach(ghost => {
+      if (ghost.isScared && ghost.currentIndex === pacmanCurrentIndex) {
+        eatGhost(ghost);
+      }
+    });
+  }
 
   function moveGhost(ghost) {
 
@@ -321,14 +388,60 @@ document.addEventListener('DOMContentLoaded', () => {
     ghost.timerId = setInterval(function () {
       if (!gameActive) return;
 
-      const dist = getDistance(ghost.currentIndex, pacmanCurrentIndex);
+      // ── Eyes returning to base ────────────────────────────────────
+      if (ghost.isReturning) {
+        if (ghost.currentIndex === ghost.startIndex) {
+          ghost.isReturning = false;
+          squares[ghost.currentIndex].classList.remove('returning-ghost');
+          updateGhostImage(ghost);
+          return;
+        }
+
+        const dirs = [-1, 1, width, -width];
+        const opposite = -ghost.direction;
+        let bestDir = null, bestDist = Infinity;
+
+        for (const d of dirs) {
+          if (d === opposite) continue;
+          const n = ghost.currentIndex + d;
+          if (n >= 0 && n < squares.length && !squares[n].classList.contains('wall')) {
+            const dist = getDistance(n, ghost.startIndex);
+            if (dist < bestDist) { bestDist = dist; bestDir = d; }
+          }
+        }
+        if (bestDir === null) {
+          for (const d of dirs) {
+            const n = ghost.currentIndex + d;
+            if (n >= 0 && n < squares.length && !squares[n].classList.contains('wall')) {
+              const dist = getDistance(n, ghost.startIndex);
+              if (dist < bestDist) { bestDist = dist; bestDir = d; }
+            }
+          }
+        }
+
+        if (bestDir !== null) {
+          const n = ghost.currentIndex + bestDir;
+          squares[ghost.currentIndex].classList.remove(ghost.className, 'ghost', 'returning-ghost');
+          squares[ghost.currentIndex].style.backgroundImage = '';
+          squares[ghost.currentIndex].style.backgroundColor = '';
+          ghost.direction = bestDir;
+          ghost.currentIndex = n;
+          squares[ghost.currentIndex].classList.add(ghost.className, 'ghost', 'returning-ghost');
+          updateGhostImage(ghost);
+        }
+        return;
+      }
+
+      // ── Normal movement ───────────────────────────────────────────
       let chosenDir;
 
       if (ghost.isScared) {
+        const opposite = -ghost.direction;
         const directions = [-1, 1, width, -width];
-        let worstDir = ghost.direction;
+        const preferred = directions.filter(d => d !== opposite);
+        let worstDir = null;
         let worstDist = -1;
-        for (const d of directions) {
+        for (const d of preferred) {
           const next = ghost.currentIndex + d;
           if (
             next >= 0 &&
@@ -340,18 +453,28 @@ document.addEventListener('DOMContentLoaded', () => {
             if (dd > worstDist) { worstDist = dd; worstDir = d; }
           }
         }
-        chosenDir = worstDir
+        if (worstDir === null) {
+          for (const d of directions) {
+            const next = ghost.currentIndex + d;
+            if (
+              next >= 0 &&
+              next < squares.length &&
+              !squares[next].classList.contains('wall') &&
+              !squares[next].classList.contains('ghost')
+            ) {
+              const dd = getDistance(next, pacmanCurrentIndex);
+              if (dd > worstDist) { worstDist = dd; worstDir = d; }
+            }
+          }
+        }
+        chosenDir = worstDir ?? ghost.direction;
       } else {
         switch (ghost.personality) {
           case 'chase':
-            chosenDir = dist <= CHASE_RANGE
-              ? getBestDirection(ghost, pacmanCurrentIndex)
-              : getRandomDirection(ghost);
+            chosenDir = getBestDirection(ghost, pacmanCurrentIndex);
             break;
           case 'intercept':
-            chosenDir = dist <= INTERCEPT_RANGE
-              ? getBestDirection(ghost, getInterceptTarget())
-              : getRandomDirection(ghost);
+            chosenDir = getBestDirection(ghost, getInterceptTarget());
             break;
           case 'blocker':
             chosenDir = getBestDirection(ghost, getBlockerTarget(ghost));
@@ -361,6 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
             break;
         }
       }
+
       const next = ghost.currentIndex + chosenDir;
       if (
         next >= 0 &&
@@ -383,12 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (ghost.isScared && squares[ghost.currentIndex].classList.contains('pac-man')) {
-        ghost.isScared = false;
-        squares[ghost.currentIndex].classList.remove(ghost.className, 'ghost', 'scared-ghost');
-        ghost.currentIndex = ghost.startIndex;
-        score += 100;
-        scoreDisplay.innerHTML = score;
-        squares[ghost.currentIndex].classList.add(ghost.className, 'ghost');
+        eatGhost(ghost);
       }
 
       updateGhostImage(ghost);
@@ -415,14 +534,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateGhostImage(ghost) {
     const el = squares[ghost.currentIndex];
-    if (ghost.isScared) {
+    if (ghost.isReturning) {
+      el.style.backgroundImage = '';
+      el.style.backgroundColor = '';
+    } else if (ghost.isScared) {
       el.style.backgroundImage = `url('pictures/sarce-ghost.png')`;
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundColor = 'transparent';
     } else {
       const dir = directionName(ghost.direction);
       el.style.backgroundImage = `url('pictures/${ghost.className}-${dir}.png')`;
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundColor = 'transparent';
     }
-    el.style.backgroundSize = 'cover';
-    el.style.backgroundColor = 'transparent';
   }
 
 
@@ -440,7 +564,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function checkForGameOver() {
     if (
       squares[pacmanCurrentIndex].classList.contains('ghost') &&
-      !squares[pacmanCurrentIndex].classList.contains('scared-ghost')
+      !squares[pacmanCurrentIndex].classList.contains('scared-ghost') &&
+      !squares[pacmanCurrentIndex].classList.contains('returning-ghost')
     ) {
       stopGame();
       sounds.waka.pause()

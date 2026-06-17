@@ -7,56 +7,63 @@
   <title>Digital Arcade</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap"
-    rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="index.css">
-  <script type="module" src="app.js"></script>
+</head>
 
 <body>
 
-  </head>
-
-  <div class="bg-grid"></div>
-  <div class="scanlines"></div>
-
-  <header>
-    <div class="logo-bracket">[</div>
-    <h1>Please Insert A Disc</h1>
-    <div class="logo-bracket">]</div>
-  </header>
-
   <main>
-    <div class="wiiu-layout">
+    <div class="aero-window">
 
-      <!-- Centre featured tile -->
-      <div class="tile">
-        <a href="pac-man/index.html" class="tile-link">
-          <div class="tile-icon">
-            <img src="../Arcade/pictures/pac-man.png" alt="Pac-Man">
+      <div class="aero-title-bar">
+        <span class="aero-title-icon"></span>
+        <span class="aero-title-bar-text">Digital Arcade</span>
+        <div class="aero-title-bar-controls">
+          <button aria-label="Minimize">&#8212;</button>
+          <button aria-label="Maximize">&#9633;</button>
+          <button aria-label="Close" class="close">&#215;</button>
+        </div>
+      </div>
+
+      <div class="aero-window-menubar">
+        <span class="menu-title">[ PLEASE INSERT A DISC ]</span>
+      </div>
+
+      <div class="aero-window-body">
+        <div class="wiiu-layout">
+
+          <div class="tile">
+            <a href="pac-man/index.html" class="tile-link">
+              <div class="tile-icon">
+                <img src="pictures/pac-man.png" alt="Pac-Man">
+              </div>
+              <span class="tile-label">PAC-MAN</span>
+            </a>
           </div>
-          <span class="tile-label">PAC-MAN</span>
-        </a>
+
+          <div class="tile tile--empty">
+            <div class="tile-icon"></div>
+            <span class="tile-label">COMING SOON</span>
+          </div>
+          <div class="tile tile--empty">
+            <div class="tile-icon"></div>
+            <span class="tile-label">COMING SOON</span>
+          </div>
+          <div class="tile tile--empty">
+            <div class="tile-icon"></div>
+            <span class="tile-label">COMING SOON</span>
+          </div>
+
+        </div>
       </div>
 
-      <div class="tile tile--empty">
-        <div class="tile-icon"></div><span class="tile-label">COMING SOON</span>
-      </div>
-      <div class="tile tile--empty">
-        <div class="tile-icon"></div><span class="tile-label">COMING SOON</span>
-      </div>
-      <div class="tile tile--empty">
-        <div class="tile-icon"></div><span class="tile-label">COMING SOON</span>
+      <div class="aero-window-footer">
+        <span>© 2026 Joshua Caleb Akinyemi // ALL SYSTEMS OPERATIONAL</span>
       </div>
 
     </div>
   </main>
-
-  <footer>
-    <span>© 2026 Joshua Caleb Akinyemi // ALL SYSTEMS OPERATIONAL</span>
-  </footer>
-
 
 </body>
 
