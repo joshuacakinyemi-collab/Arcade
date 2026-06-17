@@ -22,12 +22,24 @@ document.addEventListener('DOMContentLoaded', () => {
   let highScore = 0;
   let gameActive = false;
   let startupTimeout = null;
+  let lives = 3;
+  let bonusLifeAwarded = false;
 
   // ── Overlay ──────────────────────────────────────────────────────
   const overlay = document.getElementById('overlay');
   const overlayTitle = document.getElementById('overlay-title');
   const overlaySub = document.getElementById('overlay-subtitle');
   const overlayScore = document.getElementById('overlay-score');
+  const livesDisplay = document.getElementById('lives');
+
+  function renderLives() {
+    livesDisplay.innerHTML = '';
+    for (let i = 0; i < lives; i++) {
+      const icon = document.createElement('span');
+      icon.className = 'life-icon';
+      livesDisplay.appendChild(icon);
+    }
+  }
 
   function showOverlay(title, subtitle, scoreText) {
     overlayTitle.textContent = title;
@@ -186,6 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
       collected++;
       scoreDisplay.innerHTML = score;
       squares[pacmanCurrentIndex].classList.remove('pac-dot');
+      checkBonusLife();
       checkForWin();
     }
   }
@@ -203,6 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
       sounds.scared.play()
       setTimeout(unScareGhosts, 10000);
       squares[pacmanCurrentIndex].classList.remove('power-pellet');
+      checkBonusLife();
     }
   }
 
@@ -213,6 +227,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     sounds.scared.pause()
     sounds.scared.currentTime = 0
+  }
+
+  const BONUS_LIFE_SCORE = 10000;
+
+  function checkBonusLife() {
+    if (!bonusLifeAwarded && score >= BONUS_LIFE_SCORE) {
+      bonusLifeAwarded = true;
+      lives++;
+      renderLives();
+      showPointsPopup(pacmanCurrentIndex, '+1UP');
+    }
   }
 
   // ── Ghosts ───────────────────────────────────────────────────────
@@ -370,6 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
     scoreDisplay.innerHTML = score;
     showPointsPopup(ghost.currentIndex, 200);
     updateGhostImage(ghost);
+    checkBonusLife();
   }
 
   function checkForScaredGhostEaten() {
@@ -550,6 +576,34 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 
+  // ── Respawn ──────────────────────────────────────────────────────
+  function respawn() {
+    squares[pacmanCurrentIndex].classList.remove('pac-man');
+    squares[pacmanCurrentIndex].style.backgroundImage = '';
+    squares[pacmanCurrentIndex].style.backgroundColor = '';
+
+    ghosts.forEach(g => {
+      squares[g.currentIndex].classList.remove(g.className, 'ghost', 'scared-ghost', 'returning-ghost');
+      squares[g.currentIndex].style.backgroundImage = '';
+      squares[g.currentIndex].style.backgroundColor = '';
+    });
+
+    pacmanCurrentIndex = 490;
+    pacmanDirection = null;
+    initGhosts();
+
+    showOverlay('GET READY!', `${lives} ${lives === 1 ? 'life' : 'lives'} remaining`, '');
+
+    startupTimeout = setTimeout(() => {
+      startupTimeout = null;
+      hideOverlay();
+      squares[pacmanCurrentIndex].classList.add('pac-man');
+      gameActive = true;
+      pacmanTimer = setInterval(movePacman, 200);
+      ghosts.forEach(ghost => moveGhost(ghost));
+    }, 2000);
+  }
+
   // ── End conditions ───────────────────────────────────────────────
   function stopGame() {
     gameActive = false;
@@ -568,16 +622,24 @@ document.addEventListener('DOMContentLoaded', () => {
       !squares[pacmanCurrentIndex].classList.contains('returning-ghost')
     ) {
       stopGame();
-      sounds.waka.pause()
-      sounds.scared.pause()
-      sounds.death.currentTime = 0
-      sounds.death.play()
-      if (score > highScore) highScore = score;
-      score = 0;
-      level = 1;
-      levelDisplay.innerHTML = level;
-      scoreDisplay.innerHTML = score;
-      showOverlay('GAME OVER', 'Press Space to try again', `High Score: ${highScore}`);
+      sounds.death.currentTime = 0;
+      sounds.death.play();
+
+      lives--;
+      renderLives();
+
+      if (lives <= 0) {
+        if (score > highScore) highScore = score;
+        score = 0;
+        level = 1;
+        lives = 3;
+        bonusLifeAwarded = false;
+        levelDisplay.innerHTML = level;
+        scoreDisplay.innerHTML = score;
+        showOverlay('GAME OVER', 'Press Space to try again', `High Score: ${highScore}`);
+      } else {
+        setTimeout(respawn, 2000);
+      }
     }
   }
 
@@ -603,5 +665,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Kick off ─────────────────────────────────────────────────────
+  renderLives();
   startSequence();
 });

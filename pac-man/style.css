@@ -345,6 +345,17 @@ body {
   cursor: default;
 }
 
+.life-icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-image: url('pictures/pacman-right.png');
+  background-size: cover;
+  margin-left: 3px;
+  vertical-align: middle;
+}
+
 .aero-window-menubar span:hover {
   background: #3399ff;
   color: #fff;
